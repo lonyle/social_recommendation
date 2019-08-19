@@ -29,10 +29,10 @@ def get_decision_func_influence(k, rec_prob_func):
 	# the influence probability is the probability for a receiver to make recommendation without reward
 	''' comment: I guess here, we should apply the boosting influence algorithm '''
 
-	output_filename = '/home/liye/Code/OPIM/OPIM1.1/result/seed/' + 'seed_facebook_opim-c_minBound_k'+str(k)+'_UNI'+"{:.6f}".format(pedge)
+	output_filename = 'OPIM1.1/result/seed/' + 'seed_facebook_opim-c_minBound_k'+str(k)+'_UNI'+"{:.6f}".format(pedge)
 
 	while os.path.exists(output_filename) == False:
-		subprocess.call(['./OPIM1.1.o', '-func=1', '-gname=facebook', '-alg=opim-c',\
+		subprocess.call(['OPIM1.1/OPIM1.1.o', '-func=1', '-gname=facebook', '-alg=opim-c',\
 			 '-seedsize='+str(k), '-eps=0.01', '-model=IC', '-pdist=UNI', '-pedge='+str(pedge)], cwd='/home/liye/Code/OPIM/OPIM1.1/')
 
 	selected_nodes = set() # reset the set
