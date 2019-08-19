@@ -1,0 +1,156 @@
+{
+    "gamma_vec": [
+        0.0,
+        0.07142857142857142,
+        0.14285714285714285,
+        0.21428571428571427,
+        0.2857142857142857,
+        0.3571428571428571,
+        0.42857142857142855,
+        0.5,
+        0.5714285714285714,
+        0.6428571428571428,
+        0.7142857142857142,
+        0.7857142857142857,
+        0.8571428571428571,
+        0.9285714285714285,
+        1.0
+    ],
+    "strategy_vec": [
+        {
+            "opt_price": 1.4500000000000002,
+            "opt_profit": 26086.12991092485,
+            "opt_reward": 1.1,
+            "average_price": 0.8542055388999048,
+            "baseline_profit": 13460.799067549735,
+            "baseline_price": 0.5,
+            "baseline_social_value": 1089.7413727735666
+        },
+        {
+            "opt_price": 1.4500000000000002,
+            "opt_profit": 27047.132138008223,
+            "opt_reward": 1.05,
+            "average_price": 0.9151205984600286,
+            "baseline_profit": 14934.177781138325,
+            "baseline_price": 0.55,
+            "baseline_social_value": 958.8659852594287
+        },
+        {
+            "opt_price": 1.4500000000000002,
+            "opt_profit": 28128.340008073304,
+            "opt_reward": 1.0,
+            "average_price": 0.9724797181106344,
+            "baseline_profit": 16280.120175380194,
+            "baseline_price": 0.6000000000000001,
+            "baseline_social_value": 821.1880856357062
+        },
+        {
+            "opt_price": 1.5,
+            "opt_profit": 28713.717559725934,
+            "opt_reward": 1.05,
+            "average_price": 0.9553544916303114,
+            "baseline_profit": 18059.19631925711,
+            "baseline_price": 0.5,
+            "baseline_social_value": 2118.6424222891737
+        },
+        {
+            "opt_price": 1.4500000000000002,
+            "opt_profit": 29576.3074637376,
+            "opt_reward": 0.9500000000000001,
+            "average_price": 1.013632805133661,
+            "baseline_profit": 19803.117833015764,
+            "baseline_price": 0.55,
+            "baseline_social_value": 1847.2815986793182
+        },
+        {
+            "opt_price": 1.5,
+            "opt_profit": 30511.374118750588,
+            "opt_reward": 1.0,
+            "average_price": 1.002384352458387,
+            "baseline_profit": 21694.938543222153,
+            "baseline_price": 0.6000000000000001,
+            "baseline_social_value": 1601.91255928285
+        },
+        {
+            "opt_price": 1.4500000000000002,
+            "opt_profit": 31147.50812435242,
+            "opt_reward": 0.9500000000000001,
+            "average_price": 0.9926061292818218,
+            "baseline_profit": 23341.92906096136,
+            "baseline_price": 0.65,
+            "baseline_social_value": 1341.9152474584107
+        },
+        {
+            "opt_price": 1.35,
+            "opt_profit": 32171.03586805424,
+            "opt_reward": 0.8,
+            "average_price": 1.0217644808409223,
+            "baseline_profit": 25210.463047664485,
+            "baseline_price": 0.65,
+            "baseline_social_value": 1582.303975360513
+        },
+        {
+            "opt_price": 1.35,
+            "opt_profit": 33014.06539188867,
+            "opt_reward": 0.8500000000000001,
+            "average_price": 0.962511390580553,
+            "baseline_profit": 26522.743207082203,
+            "baseline_price": 0.65,
+            "baseline_social_value": 1786.026528075079
+        },
+        {
+            "opt_price": 1.25,
+            "opt_profit": 34036.24843839796,
+            "opt_reward": 0.75,
+            "average_price": 0.929967899180145,
+            "baseline_profit": 28334.104079559802,
+            "baseline_price": 0.7000000000000001,
+            "baseline_social_value": 1466.5824702385746
+        },
+        {
+            "opt_price": 1.2000000000000002,
+            "opt_profit": 35032.86734033309,
+            "opt_reward": 0.65,
+            "average_price": 0.9465365149129974,
+            "baseline_profit": 30103.718262122973,
+            "baseline_price": 0.75,
+            "baseline_social_value": 1168.0682450868223
+        },
+        {
+            "opt_price": 1.25,
+            "opt_profit": 36087.744768565666,
+            "opt_reward": 0.7000000000000001,
+            "average_price": 0.9575750986607154,
+            "baseline_profit": 31559.898281657042,
+            "baseline_price": 0.7000000000000001,
+            "baseline_social_value": 1847.9441728178626
+        },
+        {
+            "opt_price": 1.1500000000000001,
+            "opt_profit": 37190.900835283166,
+            "opt_reward": 0.55,
+            "average_price": 0.9467780324796631,
+            "baseline_profit": 33239.16790816907,
+            "baseline_price": 0.75,
+            "baseline_social_value": 1460.6347261165458
+        },
+        {
+            "opt_price": 1.2000000000000002,
+            "opt_profit": 38236.637511855566,
+            "opt_reward": 0.6000000000000001,
+            "average_price": 0.9631103941829525,
+            "baseline_profit": 34960.9444931131,
+            "baseline_price": 0.75,
+            "baseline_social_value": 1617.9513398727352
+        },
+        {
+            "opt_price": 1.1,
+            "opt_profit": 39590.47844227966,
+            "opt_reward": 0.6000000000000001,
+            "average_price": 0.8423201657483314,
+            "baseline_profit": 36490.38957904433,
+            "baseline_price": 0.8,
+            "baseline_social_value": 1217.2747905862448
+        }
+    ]
+}

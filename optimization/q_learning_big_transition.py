@@ -1,0 +1,331 @@
+# created on 12-27: copied from dynamic_programming
+# this is the q-learning algorithm with epsilon-greedy exploration (currently, epsilon is set to decrease in the rate 1/sqrt(n) )
+# first modification on 12-28: use backward to update, hope to have faster convergence
+# second modification on 12-28: use expected reward as the transition reward
+
+# edited on 2019-1-17: during forward simulation, only when one state is transited to another big state, we update the record
+# 2019-1-17: we also add the default_weight_vec, so that the actions are not initialized at random
+
+import random
+import math
+import logging
+import social_network
+import evaluate
+import facebook_osn
+import argparse
+import matplotlib.pyplot as plt
+import utils
+import numpy as np
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('q-learning-big-transition')
+LOG_STEP = 500
+
+if utils.graph_name == 'Facebook':
+	STATE_GRID = 200
+	WAITING_GRID = 5
+else: # == 'Yelp'
+	STATE_GRID = 2000
+	WAITING_GRID = 10
+
+BIG_TRANS_STEP = 20
+
+default_weight_vec = [0.5, 0.5]
+
+ALPHA = 0.1 # learning rate
+EPSILON_SCALAR = 1 # the larger, the more random. how many n is considered a step in the epsilon greedy
+
+state_dict = dict() # store the information of the state table
+
+def state_param_to_key(state_param):
+	m, delta_m, n, delta_n = state_param
+	big_informed_index = (m+n) // STATE_GRID * STATE_GRID
+	big_waiting_informed_index = (delta_m+delta_n) // WAITING_GRID * WAITING_GRID
+	return str(big_informed_index) + ',' + str(big_waiting_informed_index)#//10)+ ',' + str(delta_n//10)
+	# now the remaining number of users for other information is accurate, so we use delta_m
+
+
+class State():
+	def __init__(self, state_key, is_terminal=False):
+		self.state_key = state_key
+		self.is_terminal = is_terminal
+		
+		self.visits = 0
+
+		self.unexplored_actions = utils.possible_actions[:]
+
+		self.action_dict = dict()
+		for action in utils.possible_actions:
+			key = utils.action_to_key(action)
+			self.action_dict[key] = {'count': 0, 'q': 0, 'sum_q': 0} # prepared to calculate the average
+
+
+		self.max_actions = []
+
+	def get_max_q(self):
+		# bug here, if q value is updated, we should use the latest q-value
+		if self.is_terminal == True:
+			return 0 # 0 q-value for the terminal nodes
+
+		max_q = 0
+		self.max_actions = []
+		for action in utils.possible_actions:
+			action_key = utils.action_to_key(action)
+
+			if self.action_dict[action_key]['q'] == max_q:
+				self.max_actions.append(action)
+			elif self.action_dict[action_key]['q'] > max_q:
+				max_q = self.action_dict[action_key]['q']
+				self.max_actions = [action]
+
+		return max_q
+
+	
+
+	def update_q_value(self, action, new_value): # new value equals r+next_state.max_q
+		action_key = utils.action_to_key(action)
+
+		# update the q-value
+		if self.action_dict[action_key]['count'] == 0:
+			q = new_value # if new previous record, use the latest value
+		else:
+			old_q = self.action_dict[action_key]['q']
+			# print('old_q:', old_q, 'r:', r, 'next_state.max_q:', next_state.get_max_q() )
+			q = (1-ALPHA)*old_q + ALPHA*( new_value )
+
+		self.action_dict[action_key]['q'] = q
+		self.action_dict[action_key]['sum_q'] += new_value
+		self.action_dict[action_key]['count'] += 1
+
+	def get_q_value(self, action):
+		action_key = utils.action_to_key(action)
+		return self.action_dict[action_key]['q']
+
+
+	def best_action(self, epsilon): # UCB-style or epsilon-greedy style
+		if len(self.unexplored_actions) > 0:
+			# initialize with a good probability
+			if len(self.unexplored_actions) == len(utils.possible_actions):
+				#print ('default_weight_vec:', default_weight_vec)
+				choice = np.random.choice(self.unexplored_actions, p=default_weight_vec)
+			else:
+				choice = random.choice(self.unexplored_actions)
+			self.unexplored_actions.remove(choice)
+			return choice
+
+		if random.random() < epsilon:
+			return random.choice(utils.possible_actions)
+
+		self.get_max_q()
+
+		if len(self.max_actions) == 0:
+			logger.warning('the max_action vector is empty')
+			return random.choice(utils.possible_actions)
+		return random.choice(self.max_actions)
+
+	def __repr__(self):
+		return 'State: %s \t visits:%d'%(self.state_key, self.visits)
+
+
+
+def forward_simulation(graph, root_state, root_param, n, is_log = False):
+	''' do forward_simulation, and update the q-function
+	'''
+	graph.reset()
+
+	state_seq = []  # including the terminating state
+	action_seq = [] # 
+	r_seq = []
+
+	current_state = root_state
+
+	while True:
+		if is_log:
+			logger.info(current_state)
+		
+		current_state.visits += 1
+		epsilon = math.sqrt( 1/( int(n//EPSILON_SCALAR) +1) ) # devided by the number of iterations, i.e. n
+		action = current_state.best_action(epsilon)
+
+		## the simplest modification, repeat the action for BIG_TRANS_STEP times
+		## the next modification, repeat until state transit
+		########################### old ###################################
+		#r_sum = graph.next(action)
+		########################### new ###################################
+		r_sum = 0
+		current_state_key = state_param_to_key(graph.current_state_param())
+		while True:
+			r = graph.next(action)
+			r_sum += r
+			next_state_param = graph.current_state_param()
+			next_state_key = state_param_to_key(next_state_param)
+			if next_state_key != current_state_key:
+				break
+			if (next_state_param[1] + next_state_param[3] == 0):
+				break # prevent dead-loop
+		###################################################################
+
+		### recording the results ###
+		state_seq.append(current_state)
+		action_seq.append(action)
+		r_seq.append(r_sum)
+		#############################
+
+		next_state_param = graph.current_state_param()
+		#print ('next_state_param:', next_state_param)
+
+		next_state_key = state_param_to_key(next_state_param)
+
+		# if encountering a new state
+		if next_state_key not in state_dict:
+			is_terminal = (next_state_param[1] + next_state_param[3] == 0)
+			state_dict[next_state_key] = State(next_state_key, is_terminal)
+
+		next_state = state_dict[next_state_key]
+
+		current_state = next_state
+		if (next_state_param[1] + next_state_param[3] == 0):
+			break
+
+	state_seq.append(current_state)
+
+	return state_seq, action_seq, r_seq
+
+def backward_update(state_seq, action_seq, r_seq, is_log):
+	''' starting from the last visited state, go back and do the update
+	'''
+	n_state = len(state_seq)
+	for i in range(n_state-2, -1, -1):
+		next_state = state_seq[i+1]
+		current_state = state_seq[i]
+
+		action = action_seq[i]
+		r = r_seq[i]
+
+		#is_log = False # turn off the log
+		######### print the q-value before and after updating along the path #########
+		if is_log: #and random.random() < 0.0001:
+			print ('current state:', current_state)
+			print ('action:', action)
+			print ('q-value before updating:', current_state.get_q_value(action) )
+
+		new_value = r+next_state.get_max_q()
+		current_state.update_q_value( action, new_value )
+
+		if is_log: # and random.random() < 0.0001:
+			print ('new_value:', new_value, 'updated_value:', current_state.get_q_value(action) )
+
+	return 0
+
+def update_q_table(num_sims, graph):
+	# initialize the root
+	root_param = (0, 0, 0, graph.N_other_info)
+	root_key = state_param_to_key(root_param)
+	root_state = State(root_key)
+	state_dict[root_key] = root_state
+
+	for n in range(num_sims):
+		if n % LOG_STEP == 0:
+			is_log = True
+		else:
+			is_log = False
+
+		if n % 10 == 0:
+			logger.info('number of simulation:%d', n)
+		state_seq, action_seq, r_seq = forward_simulation(graph, root_state, n, is_log)
+		backward_update(state_seq, action_seq, r_seq, is_log)
+
+		if n % LOG_STEP == 0:
+			price_seq = [action['price'] for action in action_seq]
+			reward_seq = [action['reward'] for action in action_seq]
+			# plt.plot(price_seq, color='blue')
+			# plt.plot(reward_seq, color='red')
+			# plt.show()
+
+def decision_func(state_param):
+	key = state_param_to_key(state_param)
+	if key in state_dict:
+		action = state_dict[key].best_action(0)
+		return action
+	else: # not in the state_dict (not visited), return a random action
+		logger.warning('state not visited: %s', key)
+		print (state_param)
+		#print ('default_weight_vec:', default_weight_vec)
+		return np.random.choice(utils.possible_actions, p=default_weight_vec)
+
+def find_decision_func(num_sims, delta, adopt_rec_prob_dict):
+	global state_dict
+	state_dict = dict() # reset the state_dict before finding the optimal policy
+
+	# TODO: change the graph initialization to the action->prob dict
+	def rec_prob_func(price, reward):
+		action_key = utils.action_to_key({'price': price, 'reward': reward})
+		return adopt_rec_prob_dict['recommend'][action_key]
+
+	def adopt_prob_func(price, reward):
+		action_key = utils.action_to_key({'price': price, 'reward': reward})
+		return adopt_rec_prob_dict['adopt'][action_key] 
+
+	print ('constructing a graph by social network')
+	graph = social_network.Graph(delta, rec_prob_func, adopt_prob_func) 
+	update_q_table(num_sims, graph)
+
+	return decision_func
+
+def runner(delta, rec_prob_func, adopt_prob_func, num_sims):
+	graph = social_network.Graph(delta, rec_prob_func, adopt_prob_func)
+
+	global state_dict
+	state_dict = dict()
+
+	update_q_table(num_sims, graph)
+
+	# evaluating the learned decisions
+	average_profit = evaluate.evaluate_average(graph, decision_func, 100)
+	print ('average profit of the learned decision policy:', average_profit)
+	return average_profit
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description = 'q-learning')
+	parser.add_argument('--num_sims', action = 'store', required = True, type = int, \
+		help = 'Number of simulations to run')
+	args = parser.parse_args()
+
+	num_sims = args.num_sims
+
+	delta = 0.1
+
+	# def rec_prob_func(price, reward):
+	# 	rec_prob = 0.1 + 0.2 * reward 
+	# 	return rec_prob
+
+	# def adopt_prob_func(price, reward):
+	# 	adopt_prob = 0.1 + 0.1 * (1-price)
+	# 	return adopt_prob
+
+	def rec_prob_func(price, reward):
+		rec_prob = 0.02 + 0.36 * reward
+		return rec_prob * 5
+
+	def adopt_prob_func(price, reward):
+		adopt_prob = 0.1 + 0.2 * (1-price)
+		return adopt_prob
+
+	runner(delta, rec_prob_func, utils.true_adopt_prob_func, num_sims)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,35 @@
+{
+    "q_learning_vec": [],
+    "opt_mixed_vec": [
+        38502.345,
+        44821.23,
+        53285.07
+    ],
+    "opt_fixed_vec": [
+        34802.365,
+        39024.095,
+        44178.91
+    ],
+    "degree_cutoff_vec": [
+        45912.5075,
+        53966.235,
+        63932.5375
+    ],
+    "param_vec": [
+        0.01,
+        0.05,
+        0.1
+    ],
+    "baseline_profit_vec": [
+        12649.24,
+        23765.46,
+        37337.77
+    ],
+    "influence_cutoff_vec": [],
+    "time_cutoff_vec": [
+        37339.35,
+        46348.875,
+        57606.555
+    ],
+    "boosted_cutoff_vec": []
+}

@@ -1,0 +1,1 @@
+mongod --dbpath /newpar/mongo # you may need to change to your own path

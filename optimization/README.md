@@ -1,0 +1,2 @@
+- MDP.py: offline markov decision process
+- reinforcement.py: online learning to infer the parameters and optimize at the same time

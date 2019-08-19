@@ -1,0 +1,57 @@
+[
+    {
+        "opt_profit": 0.049559845077776415,
+        "enhancement": 100.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.026239468369009897,
+        "enhancement": 190.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.01785846733973971,
+        "enhancement": 280.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.013550913884306404,
+        "enhancement": 370.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.010936132726045992,
+        "enhancement": 460.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.009189976765828115,
+        "enhancement": 550.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.007942777247355513,
+        "enhancement": 640.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.0070149601619639125,
+        "enhancement": 730.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.0063290442921169025,
+        "enhancement": 820.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.005808404857364464,
+        "enhancement": 910.0,
+        "opt_reward": 0.0
+    },
+    {
+        "opt_profit": 0.005453130573064973,
+        "enhancement": 1000.0,
+        "opt_reward": 4.75
+    }
+]
